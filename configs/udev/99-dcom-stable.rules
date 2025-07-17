@@ -1,0 +1,32 @@
+# DCOM USB Device Stable Naming Rules
+# Prevents device name shuffling after reboot
+
+# Huawei E3372 Series (both H and S variants)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", ATTRS{idProduct}=="1f01", ATTRS{..serial}=="?*", SYMLINK+="dcom-huawei-$attr{..serial}"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", ATTRS{idProduct}=="14fe", ATTRS{..serial}=="?*", SYMLINK+="dcom-huawei-$attr{..serial}"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", ATTRS{idProduct}=="1506", ATTRS{..serial}=="?*", SYMLINK+="dcom-huawei-$attr{..serial}"
+
+# ZTE Devices
+SUBSYSTEM=="tty", ATTRS{idVendor}=="19d2", ATTRS{..serial}=="?*", SYMLINK+="dcom-zte-$attr{..serial}"
+
+# Olax Devices (if used)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="05c6", ATTRS{..serial}=="?*", SYMLINK+="dcom-olax-$attr{..serial}"
+
+# Generic mapping by USB port position (backup method)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-1.1:*", SYMLINK+="dcom01"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-1.2:*", SYMLINK+="dcom02"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-1.3:*", SYMLINK+="dcom03"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-1.4:*", SYMLINK+="dcom04"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-2.1:*", SYMLINK+="dcom05"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-2.2:*", SYMLINK+="dcom06"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-2.3:*", SYMLINK+="dcom07"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", KERNELS=="1-2.4:*", SYMLINK+="dcom08"
+
+# Power management optimization for DCOM devices
+SUBSYSTEM=="usb", ATTRS{idVendor}=="12d1", ATTR{power/autosuspend}="-1"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="19d2", ATTR{power/autosuspend}="-1"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="05c6", ATTR{power/autosuspend}="-1"
+
+# Set device permissions for proxy user access
+SUBSYSTEM=="tty", ATTRS{idVendor}=="12d1", MODE="0666", GROUP="dialout"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="19d2", MODE="0666", GROUP="dialout"

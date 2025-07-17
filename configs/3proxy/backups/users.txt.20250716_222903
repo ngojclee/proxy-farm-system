@@ -1,0 +1,15 @@
+admin:CL:admin123
+root:CL:rootpass
+multi_user1:CL:multi_pass1
+http_user1:CL:http_pass1
+socks_user1:CL:socks_pass1
+user1:CL:pass1
+user2:CL:pass2
+user3:CL:pass3
+customer1:CL:cust1pass
+customer2:CL:cust2pass
+limited1:CL:limit1pass
+limited2:CL:limit2pass
+vip1:CL:vip1pass
+dev1:CL:dev123
+test1:CL:test123
