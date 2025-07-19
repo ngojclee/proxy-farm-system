@@ -1,0 +1,9 @@
+admin:CL:admin123
+root:CL:rootpass
+customer1:CL:cust1pass
+customer2:CL:cust2pass
+limited1:CL:limit1pass
+limited2:CL:limit2pass
+vip1:CL:vip1pass
+dev1:CL:dev123
+test1:CL:test123

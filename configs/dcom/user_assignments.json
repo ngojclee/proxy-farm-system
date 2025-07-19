@@ -1,0 +1,13 @@
+{
+  "user_assignments": {
+    "louis": "dcom1"
+  },
+  "dcom_assignments": {
+    "dcom1": [
+      "louis"
+    ],
+    "dcom2": [],
+    "dcom3": []
+  },
+  "last_updated": "2025-07-17T11:05:25.847300"
+}

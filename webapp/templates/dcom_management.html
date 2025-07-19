@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCOM Devices - ProxyFarm</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #0a0a0b;
+            --secondary-bg: #1a1a1b;
+            --tertiary-bg: #2a2a2b;
+            --accent-color: #00d4aa;
+            --accent-hover: #00b894;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #666666;
+            --border-color: #333333;
+            --success-color: #00d4aa;
+            --warning-color: #fdcb6e;
+            --danger-color: #e17055;
+            --info-color: #74b9ff;
+        }
+
+        [data-theme="light"] {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f8f9fa;
+            --tertiary-bg: #e9ecef;
+            --text-primary: #2c3e50;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--secondary-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: var(--accent-color);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--tertiary-bg);
+            color: var(--accent-color);
+        }
+
+        .nav-link i {
+            margin-right: 12px;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            background: var(--primary-bg);
+        }
+
+        .header {
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--tertiary-bg);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            color: var(--accent-color);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        /* Device Stats */
+        .device-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .device-stat {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .device-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        .device-stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Device Cards */
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .device-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .device-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.1);
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .device-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .device-details h3 {
+            color: var(--text-primary);
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .device-details p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .device-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .device-status.connected {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--success-color);
+        }
+
+        .device-status.disconnected {
+            background: rgba(225, 112, 85, 0.1);
+            color: var(--danger-color);
+        }
+
+        .device-status.reconnecting {
+            background: rgba(253, 203, 110, 0.1);
+            color: var(--warning-color);
+        }
+
+        .device-body {
+            margin-bottom: 20px;
+        }
+
+        .device-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .metric-value.ip {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+        }
+
+        /* Signal Strength */
+        .signal-strength {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signal-bars {
+            display: flex;
+            gap: 2px;
+            align-items: flex-end;
+        }
+
+        .signal-bar {
+            width: 4px;
+            background: var(--text-muted);
+            border-radius: 2px;
+        }
+
+        .signal-bar.active {
+            background: var(--success-color);
+        }
+
+        .signal-bar:nth-child(1) { height: 8px; }
+        .signal-bar:nth-child(2) { height: 12px; }
+        .signal-bar:nth-child(3) { height: 16px; }
+        .signal-bar:nth-child(4) { height: 20px; }
+        .signal-bar:nth-child(5) { height: 24px; }
+
+        .signal-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Network Type Badge */
+        .network-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .network-badge.lte {
+            background: rgba(116, 185, 255, 0.1);
+            color: var(--info-color);
+        }
+
+        .network-badge.lte-a {
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--success-color);
+        }
+
+        .network-badge.g5 {
+            background: rgba(253, 203, 110, 0.1);
+            color: var(--warning-color);
+        }
+
+        /* User Assignment */
+        .user-assignment {
+            background: var(--tertiary-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .assignment-title {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-count {
+            color: var(--accent-color);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .user-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .user-tag {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 11px;
+            color: var(--text-primary);
+        }
+
+        /* Actions */
+        .device-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--tertiary-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d63031;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e17055;
+        }
+
+        /* Connection Chart */
+        .connection-chart {
+            background: var(--tertiary-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .chart-title {
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-value {
+            color: var(--accent-color);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .chart-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--secondary-bg);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .chart-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), var(--info-color));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Status indicators */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-dot.connected {
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: var(--danger-color);
+        }
+
+        .status-dot.reconnecting {
+            background: var(--warning-color);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .device-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .device-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>ProxyFarm</h1>
+                <span>Management System</span>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-network-wired"></i>
+                            Proxy Endpoints
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            User Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fas fa-mobile-alt"></i>
+                            DCOM Devices
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-route"></i>
+                            Routing & Assignment
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="header-title">DCOM Devices</h1>
+                    <p class="header-subtitle">Monitor and manage your DCOM modem devices</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-sync"></i>
+                        Refresh Devices
+                    </button>
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Device Stats -->
+                <div class="device-stats">
+                    <div class="device-stat">
+                        <div class="device-stat-value">4</div>
+                        <div class="device-stat-label">Total Devices</div>
+                    </div>
+                    <div class="device-stat">
+                        <div class="device-stat-value">3</div>
+                        <div class="device-stat-label">Connected</div>
+                    </div>
+                    <div class="device-stat">
+                        <div class="device-stat-value">15</div>
+                        <div class="device-stat-label">Assigned Users</div>
+                    </div>
+                    <div class="device-stat">
+                        <div class="device-stat-value">2.4GB</div>
+                        <div class="device-stat-label">Data Usage</div>
+                    </div>
+                </div>
+
+                <!-- Device Grid -->
+                <div class="device-grid">
+                    <!-- Device 1 -->
+                    <div class="device-card">
+                        <div class="device-header">
+                            <div class="device-info">
+                                <div class="device-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="device-details">
+                                    <h3>DCOM Device 2</h3>
+                                    <p>Huawei E3372 LTE</p>
+                                </div>
+                            </div>
+                            <div class="device-status connected">
+                                <div class="status-dot connected"></div>
+                                <span>Connected</span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-body">
+                            <div class="device-metrics">
+                                <div class="metric">
+                                    <div class="metric-label">Public IP</div>
+                                    <div class="metric-value ip">188.215.229.237</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Interface</div>
+                                    <div class="metric-value">enx0c5b8f279a65</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Network Type</div>
+                                    <div class="metric-value">
+                                        <span class="network-badge lte-a">LTE-A</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Signal Strength</div>
+                                    <div class="metric-value">
+                                        <div class="signal-strength">
+                                            <div class="signal-bars">
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar"></div>
+                                                <div class="signal-bar"></div>
+                                            </div>
+                                            <span class="signal-text">-72 dBm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="connection-chart">
+                                <div class="chart-header">
+                                    <span class="chart-title">Connection Load</span>
+                                    <span class="chart-value">5/50 users</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="chart-fill" style="width: 10%"></div>
+                                </div>
+                            </div>
+
+                            <div class="user-assignment">
+                                <div class="assignment-header">
+                                    <span class="assignment-title">Assigned Users</span>
+                                    <span class="user-count">5 users</span>
+                                </div>
+                                <div class="user-list">
+                                    <span class="user-tag">test1</span>
+                                    <span class="user-tag">demo</span>
+                                    <span class="user-tag">client1</span>
+                                    <span class="user-tag">+2 more</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="device-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-chart-line"></i>
+                                Stats
+                            </button>
+                            <button class="btn btn-warning">
+                                <i class="fas fa-sync"></i>
+                                Restart
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-cog"></i>
+                                Configure
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Device 3 -->
+                    <div class="device-card">
+                        <div class="device-header">
+                            <div class="device-info">
+                                <div class="device-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="device-details">
+                                    <h3>DCOM Device 3</h3>
+                                    <p>Huawei E3372 LTE</p>
+                                </div>
+                            </div>
+                            <div class="device-status reconnecting">
+                                <div class="status-dot reconnecting"></div>
+                                <span>Reconnecting</span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-body">
+                            <div class="device-metrics">
+                                <div class="metric">
+                                    <div class="metric-label">Public IP</div>
+                                    <div class="metric-value ip">Acquiring...</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Interface</div>
+                                    <div class="metric-value">enx0c5b8f279a66</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Network Type</div>
+                                    <div class="metric-value">
+                                        <span class="network-badge lte">LTE</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Signal Strength</div>
+                                    <div class="metric-value">
+                                        <div class="signal-strength">
+                                            <div class="signal-bars">
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar"></div>
+                                                <div class="signal-bar"></div>
+                                                <div class="signal-bar"></div>
+                                            </div>
+                                            <span class="signal-text">-78 dBm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="connection-chart">
+                                <div class="chart-header">
+                                    <span class="chart-title">Connection Load</span>
+                                    <span class="chart-value">0/50 users</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="chart-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="user-assignment">
+                                <div class="assignment-header">
+                                    <span class="assignment-title">Assigned Users</span>
+                                    <span class="user-count">2 users (standby)</span>
+                                </div>
+                                <div class="user-list">
+                                    <span class="user-tag">backup1</span>
+                                    <span class="user-tag">backup2</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="device-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-chart-line"></i>
+                                Stats
+                            </button>
+                            <button class="btn btn-warning">
+                                <i class="fas fa-sync"></i>
+                                Restart
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-cog"></i>
+                                Configure
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Device 4 -->
+                    <div class="device-card">
+                        <div class="device-header">
+                            <div class="device-info">
+                                <div class="device-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="device-details">
+                                    <h3>DCOM Device 4</h3>
+                                    <p>Huawei E3372 LTE</p>
+                                </div>
+                            </div>
+                            <div class="device-status disconnected">
+                                <div class="status-dot disconnected"></div>
+                                <span>Disconnected</span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-body">
+                            <div class="device-metrics">
+                                <div class="metric">
+                                    <div class="metric-label">Public IP</div>
+                                    <div class="metric-value ip">No Connection</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Interface</div>
+                                    <div class="metric-value">enx0c5b8f279a67</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Network Type</div>
+                                    <div class="metric-value">
+                                        <span class="network-badge lte">LTE</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Signal Strength</div>
+                                    <div class="metric-value">
+                                        <div class="signal-strength">
+                                            <div class="signal-bars">
+                                                <div class="signal-bar"></div>
+                                                <div class="signal-bar"></div>
+                                                <div class="signal-bar"></div>
+                                                <div class="signal-bar"></div>
+                                                <div class="signal-bar"></div>
+                                            </div>
+                                            <span class="signal-text">No Signal</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="connection-chart">
+                                <div class="chart-header">
+                                    <span class="chart-title">Connection Load</span>
+                                    <span class="chart-value">0/50 users</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="chart-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="user-assignment">
+                                <div class="assignment-header">
+                                    <span class="assignment-title">Assigned Users</span>
+                                    <span class="user-count">0 users</span>
+                                </div>
+                                <div class="user-list">
+                                    <span class="user-tag">No assignments</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="device-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-chart-line"></i>
+                                Stats
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-power-off"></i>
+                                Connect
+                            </button>
+                            <button class="btn btn-danger">
+                                <i class="fas fa-trash"></i>
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        const themeIcon = document.querySelector('.theme-toggle i');
+        themeIcon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+
+        // Simulate real-time updates
+        setInterval(() => {
+            // Update connection loads
+            const loadBars = document.querySelectorAll('.chart-fill');
+            loadBars.forEach(bar => {
+                const currentWidth = parseFloat(bar.style.width) || 0;
+                const change = (Math.random() - 0.5) * 5;
+                const newWidth = Math.max(0, Math.min(100, currentWidth + change));
+                bar.style.width = `${newWidth}%`;
+            });
+
+            // Update user counts
+            const userCounts = document.querySelectorAll('.chart-value');
+            userCounts.forEach(count => {
+                const current = parseInt(count.textContent.split('/')[0]);
+                const change = Math.floor(Math.random() * 3) - 1;
+                const newCount = Math.max(0, Math.min(50, current + change));
+                count.textContent = `${newCount}/50 users`;
+            });
+
+            // Simulate signal strength changes
+            const signalBars = document.querySelectorAll('.signal-bars');
+            signalBars.forEach(bars => {
+                const allBars = bars.querySelectorAll('.signal-bar');
+                const activeCount = Math.floor(Math.random() * 5) + 1;
+                
+                allBars.forEach((bar, index) => {
+                    if (index < activeCount) {
+                        bar.classList.add('active');
+                    } else {
+                        bar.classList.remove('active');
+                    }
+                });
+            });
+        }, 5000);
+
+        // Device status simulation
+        setInterval(() => {
+            const reconnectingDevices = document.querySelectorAll('.device-status.reconnecting');
+            reconnectingDevices.forEach(status => {
+                if (Math.random() > 0.7) {
+                    status.className = 'device-status connected';
+                    status.innerHTML = '<div class="status-dot connected"></div><span>Connected</span>';
+                    
+                    // Update IP address
+                    const ipElement = status.closest('.device-card').querySelector('.metric-value.ip');
+                    ipElement.textContent = '188.215.229.238';
+                }
+            });
+        }, 10000);
+
+        // Add click handlers for device actions
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent.trim();
+                const deviceName = this.closest('.device-card').querySelector('h3').textContent;
+                
+                switch(action) {
+                    case 'Stats':
+                        alert(`Showing statistics for ${deviceName}`);
+                        break;
+                    case 'Restart':
+                        alert(`Restarting ${deviceName}...`);
+                        break;
+                    case 'Configure':
+                        alert(`Opening configuration for ${deviceName}`);
+                        break;
+                    case 'Connect':
+                        alert(`Connecting ${deviceName}...`);
+                        break;
+                    case 'Remove':
+                        if (confirm(`Are you sure you want to remove ${deviceName}?`)) {
+                            alert(`${deviceName} removed successfully`);
+                        }
+                        break;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+                                    <h3>DCOM Device 1</h3>
+                                    <p>Huawei E3372 LTE</p>
+                                </div>
+                            </div>
+                            <div class="device-status connected">
+                                <div class="status-dot connected"></div>
+                                <span>Connected</span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-body">
+                            <div class="device-metrics">
+                                <div class="metric">
+                                    <div class="metric-label">Public IP</div>
+                                    <div class="metric-value ip">188.215.229.236</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Interface</div>
+                                    <div class="metric-value">enx0c5b8f279a64</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Network Type</div>
+                                    <div class="metric-value">
+                                        <span class="network-badge lte">LTE</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-label">Signal Strength</div>
+                                    <div class="metric-value">
+                                        <div class="signal-strength">
+                                            <div class="signal-bars">
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar active"></div>
+                                                <div class="signal-bar"></div>
+                                            </div>
+                                            <span class="signal-text">-65 dBm</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="connection-chart">
+                                <div class="chart-header">
+                                    <span class="chart-title">Connection Load</span>
+                                    <span class="chart-value">8/50 users</span>
+                                </div>
+                                <div class="chart-bar">
+                                    <div class="chart-fill" style="width: 16%"></div>
+                                </div>
+                            </div>
+
+                            <div class="user-assignment">
+                                <div class="assignment-header">
+                                    <span class="assignment-title">Assigned Users</span>
+                                    <span class="user-count">8 users</span>
+                                </div>
+                                <div class="user-list">
+                                    <span class="user-tag">admin</span>
+                                    <span class="user-tag">user1</span>
+                                    <span class="user-tag">user2</span>
+                                    <span class="user-tag">premium1</span>
+                                    <span class="user-tag">+4 more</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="device-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-chart-line"></i>
+                                Stats
+                            </button>
+                            <button class="btn btn-warning">
+                                <i class="fas fa-sync"></i>
+                                Restart
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-cog"></i>
+                                Configure
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Device 2 -->
+                    <div class="device-card">
+                        <div class="device-header">
+                            <div class="device-info">
+                                <div class="device-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <div class="device-details">
