@@ -1,989 +1,354 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management - ProxyFarm</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-bg: #0a0a0b;
-            --secondary-bg: #1a1a1b;
-            --tertiary-bg: #2a2a2b;
-            --accent-color: #00d4aa;
-            --accent-hover: #00b894;
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-            --text-muted: #666666;
-            --border-color: #333333;
-            --success-color: #00d4aa;
-            --warning-color: #fdcb6e;
-            --danger-color: #e17055;
-            --info-color: #74b9ff;
-        }
-
-        [data-theme="light"] {
-            --primary-bg: #ffffff;
-            --secondary-bg: #f8f9fa;
-            --tertiary-bg: #e9ecef;
-            --text-primary: #2c3e50;
-            --text-secondary: #495057;
-            --text-muted: #6c757d;
-            --border-color: #dee2e6;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--primary-bg);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        .dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px;
-            background: var(--secondary-bg);
-            border-right: 1px solid var(--border-color);
-            padding: 20px 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .logo {
-            padding: 0 20px 30px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 30px;
-        }
-
-        .logo h1 {
-            color: var(--accent-color);
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .logo span {
-            color: var(--text-secondary);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 0 10px;
-        }
-
-        .nav-item {
-            margin-bottom: 5px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            background: var(--tertiary-bg);
-            color: var(--accent-color);
-        }
-
-        .nav-link i {
-            margin-right: 12px;
-            width: 16px;
-            text-align: center;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 260px;
-            background: var(--primary-bg);
-        }
-
-        .header {
-            background: var(--secondary-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 20px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .header-subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .theme-toggle {
-            background: var(--tertiary-bg);
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            color: var(--accent-color);
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        /* User Stats */
-        .user-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .user-stat {
-            background: var(--secondary-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .user-stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 8px;
-        }
-
-        .user-stat-label {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-secondary {
-            background: var(--tertiary-bg);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            color: var(--text-primary);
-        }
-
-        .btn-danger {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #d63031;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        /* User Card Grid */
-        .user-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .user-card {
-            background: var(--secondary-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .user-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.1);
-        }
-
-        .user-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .user-details h3 {
-            color: var(--text-primary);
-            font-size: 16px;
-            margin-bottom: 2px;
-        }
-
-        .user-details p {
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-
-        .user-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .status-dot.online {
-            background: var(--success-color);
-        }
-
-        .status-dot.offline {
-            background: var(--text-muted);
-        }
-
-        .user-card-body {
-            margin-bottom: 16px;
-        }
-
-        .user-detail {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .user-detail-label {
-            color: var(--text-secondary);
-        }
-
-        .user-detail-value {
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .proxy-config {
-            background: var(--tertiary-bg);
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 12px;
-            font-family: 'Monaco', 'Menlo', monospace;
-            font-size: 12px;
-        }
-
-        .proxy-config-header {
-            color: var(--text-secondary);
-            font-size: 11px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .proxy-config-value {
-            color: var(--accent-color);
-            word-break: break-all;
-        }
-
-        .user-card-footer {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
-        .action-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            border-radius: 6px;
-            background: var(--tertiary-bg);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-btn:hover {
-            color: var(--accent-color);
-        }
-
-        .action-btn.danger:hover {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-badge.active {
-            background: rgba(0, 212, 170, 0.1);
-            color: var(--success-color);
-        }
-
-        .status-badge.inactive {
-            background: rgba(225, 112, 85, 0.1);
-            color: var(--danger-color);
-        }
-
-        .status-badge.premium {
-            background: rgba(253, 203, 110, 0.1);
-            color: var(--warning-color);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background: var(--secondary-bg);
-            margin: 5% auto;
-            padding: 0;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            border: 1px solid var(--border-color);
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .close {
-            color: var(--text-secondary);
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            background: none;
-        }
-
-        .close:hover {
-            color: var(--text-primary);
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--tertiary-bg);
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .form-select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--tertiary-bg);
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        .modal-footer {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .user-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .user-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body data-theme="dark">
-    <div class="dashboard">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <h1>ProxyFarm</h1>
-                <span>Management System</span>
-            </div>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-tachometer-alt"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-network-wired"></i>
-                            Proxy Endpoints
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link active">
-                            <i class="fas fa-users"></i>
-                            User Management
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-mobile-alt"></i>
-                            DCOM Devices
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-route"></i>
-                            Routing & Assignment
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-chart-line"></i>
-                            Analytics
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-cog"></i>
-                            Settings
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="header">
-                <div class="header-left">
-                    <h1 class="header-title">User Management</h1>
-                    <p class="header-subtitle">Manage proxy users, credentials, and access permissions</p>
-                </div>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="openModal('addUserModal')">
-                        <i class="fas fa-user-plus"></i>
-                        Add User
-                    </button>
-                    <button class="theme-toggle" onclick="toggleTheme()">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
-            </header>
-
-            <div class="content">
-                <!-- User Stats -->
-                <div class="user-stats">
-                    <div class="user-stat">
-                        <div class="user-stat-value">15</div>
-                        <div class="user-stat-label">Total Users</div>
-                    </div>
-                    <div class="user-stat">
-                        <div class="user-stat-value">12</div>
-                        <div class="user-stat-label">Active Users</div>
-                    </div>
-                    <div class="user-stat">
-                        <div class="user-stat-value">3</div>
-                        <div class="user-stat-label">Premium Users</div>
-                    </div>
-                    <div class="user-stat">
-                        <div class="user-stat-value">47</div>
-                        <div class="user-stat-label">Active Connections</div>
-                    </div>
-                </div>
-
-                <!-- User Grid -->
-                <div class="user-grid">
-                    <!-- User Card 1 -->
-                    <div class="user-card">
-                        <div class="user-card-header">
-                            <div class="user-info">
-                                <div class="user-avatar">A</div>
-                                <div class="user-details">
-                                    <h3>admin</h3>
-                                    <p>Administrator</p>
-                                </div>
-                            </div>
-                            <div class="user-status">
-                                <div class="status-dot online"></div>
-                                <span>Online</span>
-                            </div>
-                        </div>
-                        <div class="user-card-body">
-                            <div class="user-detail">
-                                <span class="user-detail-label">Password:</span>
-                                <span class="user-detail-value">admin123</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Assigned Port:</span>
-                                <span class="user-detail-value">3330</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Type:</span>
-                                <span class="status-badge premium">Premium</span>
-                            </div>
-                            <div class="proxy-config">
-                                <div class="proxy-config-header">HTTP Proxy Config:</div>
-                                <div class="proxy-config-value">188.215.229.236:3330:admin:admin123</div>
-                            </div>
-                        </div>
-                        <div class="user-card-footer">
-                            <button class="action-btn" title="Edit User">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn" title="View Config">
-                                <i class="fas fa-code"></i>
-                            </button>
-                            <button class="action-btn" title="Reset Password">
-                                <i class="fas fa-key"></i>
-                            </button>
-                            <button class="action-btn danger" title="Delete User">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+{% extends "base.html" %}
+
+{% block title %}User Management - ProxyFarm{% endblock %}
+
+{% block page_title %}User Management{% endblock %}
+{% block page_subtitle %}Manage proxy users, credentials, and access permissions{% endblock %}
+
+{% block header_actions %}
+<button class="btn btn-primary" onclick="openModal('addUserModal')">
+    <i class="fas fa-user-plus"></i>
+    Add User
+</button>
+{% endblock %}
+
+{% block content %}
+<!-- User Stats -->
+<div class="user-stats">
+    <div class="user-stat">
+        <div class="user-stat-value">15</div>
+        <div class="user-stat-label">Total Users</div>
     </div>
+    <div class="user-stat">
+        <div class="user-stat-value">12</div>
+        <div class="user-stat-label">Active Users</div>
+    </div>
+    <div class="user-stat">
+        <div class="user-stat-value">3</div>
+        <div class="user-stat-label">Premium Users</div>
+    </div>
+    <div class="user-stat">
+        <div class="user-stat-value">47</div>
+        <div class="user-stat-label">Active Connections</div>
+    </div>
+</div>
 
-    <!-- Add User Modal -->
-    <div id="addUserModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Add New User</h2>
-                <button class="close" onclick="closeModal('addUserModal')">&times;</button>
+<!-- User Grid -->
+<div class="user-grid">
+    <!-- User Card 1 -->
+    <div class="user-card">
+        <div class="user-card-header">
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <div class="user-details">
+                    <h3>admin</h3>
+                    <p>Administrator</p>
+                </div>
             </div>
-            <div class="modal-body">
-                <form id="addUserForm">
-                    <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" class="form-input" id="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-input" id="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">User Type</label>
-                        <select class="form-select" id="userType">
-                            <option value="standard">Standard</option>
-                            <option value="premium">Premium</option>
-                            <option value="testing">Testing</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Assigned Port</label>
-                        <select class="form-select" id="assignedPort">
-                            <option value="3330">3330 (Multi-Protocol)</option>
-                            <option value="3331">3331 (HTTP)</option>
-                            <option value="3332">3332 (HTTP)</option>
-                            <option value="3333">3333 (HTTP)</option>
-                            <option value="3334">3334 (HTTP)</option>
-                            <option value="3335">3335 (SOCKS5)</option>
-                            <option value="3336">3336 (SOCKS5)</option>
-                            <option value="3337">3337 (SOCKS5)</option>
-                            <option value="3338">3338 (HTTP - No Auth)</option>
-                            <option value="3339">3339 (SOCKS5 - No Auth)</option>
-                        </select>
-                    </div>
-                </form>
+            <div class="user-status">
+                <div class="status-dot online"></div>
+                <span>Online</span>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="addUser()">Add User</button>
+        </div>
+        <div class="user-card-body">
+            <div class="user-detail">
+                <span class="user-detail-label">Password:</span>
+                <span class="user-detail-value">admin123</span>
             </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Assigned Port:</span>
+                <span class="user-detail-value">3330</span>
+            </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Type:</span>
+                <span class="status-badge premium">Premium</span>
+            </div>
+            <div class="proxy-config">
+                <div class="proxy-config-header">HTTP Proxy Config:</div>
+                <div class="proxy-config-value">188.215.229.236:3330:admin:admin123</div>
+            </div>
+        </div>
+        <div class="user-card-footer">
+            <button class="action-btn" title="Edit User">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn" title="View Config">
+                <i class="fas fa-code"></i>
+            </button>
+            <button class="action-btn" title="Reset Password">
+                <i class="fas fa-key"></i>
+            </button>
+            <button class="action-btn danger" title="Delete User">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     </div>
 
-    <script>
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    <!-- User Card 2 -->
+    <div class="user-card">
+        <div class="user-card-header">
+            <div class="user-info">
+                <div class="user-avatar">U1</div>
+                <div class="user-details">
+                    <h3>user1</h3>
+                    <p>Standard User</p>
+                </div>
+            </div>
+            <div class="user-status">
+                <div class="status-dot online"></div>
+                <span>Online</span>
+            </div>
+        </div>
+        <div class="user-card-body">
+            <div class="user-detail">
+                <span class="user-detail-label">Password:</span>
+                <span class="user-detail-value">pass123</span>
+            </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Assigned Port:</span>
+                <span class="user-detail-value">3331</span>
+            </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Type:</span>
+                <span class="status-badge active">Standard</span>
+            </div>
+            <div class="proxy-config">
+                <div class="proxy-config-header">HTTP Proxy Config:</div>
+                <div class="proxy-config-value">188.215.229.236:3331:user1:pass123</div>
+            </div>
+        </div>
+        <div class="user-card-footer">
+            <button class="action-btn" title="Edit User">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn" title="View Config">
+                <i class="fas fa-code"></i>
+            </button>
+            <button class="action-btn" title="Reset Password">
+                <i class="fas fa-key"></i>
+            </button>
+            <button class="action-btn danger" title="Delete User">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- User Card 3 -->
+    <div class="user-card">
+        <div class="user-card-header">
+            <div class="user-info">
+                <div class="user-avatar">U2</div>
+                <div class="user-details">
+                    <h3>user2</h3>
+                    <p>Standard User</p>
+                </div>
+            </div>
+            <div class="user-status">
+                <div class="status-dot offline"></div>
+                <span>Offline</span>
+            </div>
+        </div>
+        <div class="user-card-body">
+            <div class="user-detail">
+                <span class="user-detail-label">Password:</span>
+                <span class="user-detail-value">pass456</span>
+            </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Assigned Port:</span>
+                <span class="user-detail-value">3332</span>
+            </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Type:</span>
+                <span class="status-badge active">Standard</span>
+            </div>
+            <div class="proxy-config">
+                <div class="proxy-config-header">HTTP Proxy Config:</div>
+                <div class="proxy-config-value">188.215.229.236:3332:user2:pass456</div>
+            </div>
+        </div>
+        <div class="user-card-footer">
+            <button class="action-btn" title="Edit User">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn" title="View Config">
+                <i class="fas fa-code"></i>
+            </button>
+            <button class="action-btn" title="Reset Password">
+                <i class="fas fa-key"></i>
+            </button>
+            <button class="action-btn danger" title="Delete User">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- User Card 4 -->
+    <div class="user-card">
+        <div class="user-card-header">
+            <div class="user-info">
+                <div class="user-avatar">T1</div>
+                <div class="user-details">
+                    <h3>test1</h3>
+                    <p>Test User</p>
+                </div>
+            </div>
+            <div class="user-status">
+                <div class="status-dot online"></div>
+                <span>Online</span>
+            </div>
+        </div>
+        <div class="user-card-body">
+            <div class="user-detail">
+                <span class="user-detail-label">Password:</span>
+                <span class="user-detail-value">test123</span>
+            </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Assigned Port:</span>
+                <span class="user-detail-value">3338</span>
+            </div>
+            <div class="user-detail">
+                <span class="user-detail-label">Type:</span>
+                <span class="status-badge inactive">Testing</span>
+            </div>
+            <div class="proxy-config">
+                <div class="proxy-config-header">HTTP Proxy Config (No Auth):</div>
+                <div class="proxy-config-value">188.215.229.236:3338</div>
+            </div>
+        </div>
+        <div class="user-card-footer">
+            <button class="action-btn" title="Edit User">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="action-btn" title="View Config">
+                <i class="fas fa-code"></i>
+            </button>
+            <button class="action-btn" title="Reset Password">
+                <i class="fas fa-key"></i>
+            </button>
+            <button class="action-btn danger" title="Delete User">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div id="addUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add New User</h2>
+            <button class="close" onclick="closeModal('addUserModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">User Type</label>
+                    <select class="form-select" id="userType">
+                        <option value="standard">Standard</option>
+                        <option value="premium">Premium</option>
+                        <option value="testing">Testing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Assigned Port</label>
+                    <select class="form-select" id="assignedPort">
+                        <option value="3330">3330 (Multi-Protocol)</option>
+                        <option value="3331">3331 (HTTP)</option>
+                        <option value="3332">3332 (HTTP)</option>
+                        <option value="3333">3333 (HTTP)</option>
+                        <option value="3334">3334 (HTTP)</option>
+                        <option value="3335">3335 (SOCKS5)</option>
+                        <option value="3336">3336 (SOCKS5)</option>
+                        <option value="3337">3337 (SOCKS5)</option>
+                        <option value="3338">3338 (HTTP - No Auth)</option>
+                        <option value="3339">3339 (SOCKS5 - No Auth)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="addUser()">Add User</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function addUser() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const userType = document.getElementById('userType').value;
+    const assignedPort = document.getElementById('assignedPort').value;
+
+    if (!username || !password) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    // Simulate adding user
+    alert(`User "${username}" added successfully with port ${assignedPort}`);
+    closeModal('addUserModal');
+    
+    // Reset form
+    document.getElementById('addUserForm').reset();
+}
+
+// Copy config to clipboard
+function copyConfig(config) {
+    navigator.clipboard.writeText(config).then(() => {
+        alert('Configuration copied to clipboard!');
+    });
+}
+
+// Simulate user status updates
+setInterval(() => {
+    const statusDots = document.querySelectorAll('.status-dot');
+    statusDots.forEach(dot => {
+        if (Math.random() > 0.9) {
+            dot.classList.toggle('online');
+            dot.classList.toggle('offline');
             
-            body.setAttribute('data-theme', newTheme);
-            
-            const icon = document.querySelector('.theme-toggle i');
-            icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
-            
-            localStorage.setItem('theme', newTheme);
+            const statusText = dot.closest('.user-status').querySelector('span');
+            statusText.textContent = dot.classList.contains('online') ? 'Online' : 'Offline';
         }
+    });
+}, 10000);
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.body.setAttribute('data-theme', savedTheme);
-        const themeIcon = document.querySelector('.theme-toggle i');
-        themeIcon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+// Click handlers for proxy config copying
+document.querySelectorAll('.proxy-config-value').forEach(config => {
+    config.addEventListener('click', function() {
+        copyConfig(this.textContent);
+    });
+    config.style.cursor = 'pointer';
+    config.title = 'Click to copy';
+});
 
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
+// Modal close on outside click
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
         }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function addUser() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const userType = document.getElementById('userType').value;
-            const assignedPort = document.getElementById('assignedPort').value;
-
-            if (!username || !password) {
-                alert('Please fill in all required fields');
-                return;
-            }
-
-            // Simulate adding user
-            alert(`User "${username}" added successfully with port ${assignedPort}`);
-            closeModal('addUserModal');
-            
-            // Reset form
-            document.getElementById('addUserForm').reset();
-        }
-
-        // Generate random password
-        function generatePassword() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let password = '';
-            for (let i = 0; i < 12; i++) {
-                password += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return password;
-        }
-
-        // Copy config to clipboard
-        function copyConfig(config) {
-            navigator.clipboard.writeText(config).then(() => {
-                alert('Configuration copied to clipboard!');
-            });
-        }
-
-        // Simulate user status updates
-        setInterval(() => {
-            const statusDots = document.querySelectorAll('.status-dot');
-            statusDots.forEach(dot => {
-                if (Math.random() > 0.9) {
-                    dot.classList.toggle('online');
-                    dot.classList.toggle('offline');
-                    
-                    const statusText = dot.closest('.user-status').querySelector('span');
-                    statusText.textContent = dot.classList.contains('online') ? 'Online' : 'Offline';
-                }
-            });
-        }, 10000);
-
-        // Click handlers for proxy config copying
-        document.querySelectorAll('.proxy-config-value').forEach(config => {
-            config.addEventListener('click', function() {
-                copyConfig(this.textContent);
-            });
-            config.style.cursor = 'pointer';
-            config.title = 'Click to copy';
-        });
-
-        // Modal close on outside click
-        window.onclick = function(event) {
-            const modals = document.querySelectorAll('.modal');
-            modals.forEach(modal => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                }
-            });
-        }
-    </script>
-</body>
-</html>="fas fa-code"></i>
-                            </button>
-                            <button class="action-btn" title="Reset Password">
-                                <i class="fas fa-key"></i>
-                            </button>
-                            <button class="action-btn danger" title="Delete User">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- User Card 2 -->
-                    <div class="user-card">
-                        <div class="user-card-header">
-                            <div class="user-info">
-                                <div class="user-avatar">U1</div>
-                                <div class="user-details">
-                                    <h3>user1</h3>
-                                    <p>Standard User</p>
-                                </div>
-                            </div>
-                            <div class="user-status">
-                                <div class="status-dot online"></div>
-                                <span>Online</span>
-                            </div>
-                        </div>
-                        <div class="user-card-body">
-                            <div class="user-detail">
-                                <span class="user-detail-label">Password:</span>
-                                <span class="user-detail-value">pass123</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Assigned Port:</span>
-                                <span class="user-detail-value">3331</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Type:</span>
-                                <span class="status-badge active">Standard</span>
-                            </div>
-                            <div class="proxy-config">
-                                <div class="proxy-config-header">HTTP Proxy Config:</div>
-                                <div class="proxy-config-value">188.215.229.236:3331:user1:pass123</div>
-                            </div>
-                        </div>
-                        <div class="user-card-footer">
-                            <button class="action-btn" title="Edit User">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn" title="View Config">
-                                <i class="fas fa-code"></i>
-                            </button>
-                            <button class="action-btn" title="Reset Password">
-                                <i class="fas fa-key"></i>
-                            </button>
-                            <button class="action-btn danger" title="Delete User">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- User Card 3 -->
-                    <div class="user-card">
-                        <div class="user-card-header">
-                            <div class="user-info">
-                                <div class="user-avatar">U2</div>
-                                <div class="user-details">
-                                    <h3>user2</h3>
-                                    <p>Standard User</p>
-                                </div>
-                            </div>
-                            <div class="user-status">
-                                <div class="status-dot offline"></div>
-                                <span>Offline</span>
-                            </div>
-                        </div>
-                        <div class="user-card-body">
-                            <div class="user-detail">
-                                <span class="user-detail-label">Password:</span>
-                                <span class="user-detail-value">pass456</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Assigned Port:</span>
-                                <span class="user-detail-value">3332</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Type:</span>
-                                <span class="status-badge active">Standard</span>
-                            </div>
-                            <div class="proxy-config">
-                                <div class="proxy-config-header">HTTP Proxy Config:</div>
-                                <div class="proxy-config-value">188.215.229.236:3332:user2:pass456</div>
-                            </div>
-                        </div>
-                        <div class="user-card-footer">
-                            <button class="action-btn" title="Edit User">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn" title="View Config">
-                                <i class="fas fa-code"></i>
-                            </button>
-                            <button class="action-btn" title="Reset Password">
-                                <i class="fas fa-key"></i>
-                            </button>
-                            <button class="action-btn danger" title="Delete User">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- User Card 4 -->
-                    <div class="user-card">
-                        <div class="user-card-header">
-                            <div class="user-info">
-                                <div class="user-avatar">T1</div>
-                                <div class="user-details">
-                                    <h3>test1</h3>
-                                    <p>Test User</p>
-                                </div>
-                            </div>
-                            <div class="user-status">
-                                <div class="status-dot online"></div>
-                                <span>Online</span>
-                            </div>
-                        </div>
-                        <div class="user-card-body">
-                            <div class="user-detail">
-                                <span class="user-detail-label">Password:</span>
-                                <span class="user-detail-value">test123</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Assigned Port:</span>
-                                <span class="user-detail-value">3338</span>
-                            </div>
-                            <div class="user-detail">
-                                <span class="user-detail-label">Type:</span>
-                                <span class="status-badge inactive">Testing</span>
-                            </div>
-                            <div class="proxy-config">
-                                <div class="proxy-config-header">HTTP Proxy Config (No Auth):</div>
-                                <div class="proxy-config-value">188.215.229.236:3338</div>
-                            </div>
-                        </div>
-                        <div class="user-card-footer">
-                            <button class="action-btn" title="Edit User">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn" title="View Config">
-                                <i class
+    });
+}
+</script>
+{% endblock %}

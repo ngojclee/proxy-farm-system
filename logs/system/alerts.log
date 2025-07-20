@@ -1,0 +1,36 @@
+[2025-07-19 23:50:01] ALERT: Webapp process is not running
+[2025-07-19 23:50:01] ALERT: 3proxy process is not running
+[2025-07-19 23:50:01] ALERT: DCOM devices found but no active network interfaces
+[2025-07-19 23:50:01] ALERT: Webapp process is not running
+[2025-07-19 23:50:18] ALERT: 3proxy process is not running
+[2025-07-19 23:50:23] ALERT: 3proxy process is not running
+[2025-07-19 23:50:23] ALERT: Failed to restart 3proxy
+[2025-07-19 23:55:04] ALERT: 3proxy process is not running
+[2025-07-19 23:55:04] ALERT: DCOM devices found but no active network interfaces
+[2025-07-19 23:55:05] ALERT: 3proxy process is not running
+[2025-07-19 23:55:11] ALERT: 3proxy process is not running
+[2025-07-19 23:55:11] ALERT: Failed to restart 3proxy
+[2025-07-19 23:56:30] ALERT: 3proxy process is not running
+[2025-07-19 23:56:31] ALERT: DCOM devices found but no active network interfaces
+[2025-07-19 23:56:34] ALERT: 3proxy process is not running
+[2025-07-20 00:00:03] ALERT: 3proxy process is not running
+[2025-07-20 00:00:03] ALERT: 3proxy process is not running
+[2025-07-20 00:00:03] ALERT: DCOM devices found but no active network interfaces
+[2025-07-20 00:00:03] ALERT: DCOM devices found but no active network interfaces
+[2025-07-20 00:00:04] ALERT: 3proxy process is not running
+[2025-07-20 00:00:07] ALERT: 3proxy process is not running
+[2025-07-20 00:00:12] ALERT: 3proxy process is not running
+[2025-07-20 00:00:12] ALERT: Failed to restart 3proxy
+[2025-07-20 00:05:03] ALERT: 3proxy process is not running
+[2025-07-20 00:05:03] ALERT: DCOM devices found but no active network interfaces
+[2025-07-20 00:05:05] ALERT: 3proxy process is not running
+[2025-07-20 00:05:10] ALERT: 3proxy process is not running
+[2025-07-20 00:05:10] ALERT: Failed to restart 3proxy
+[2025-07-20 00:10:03] ALERT: 3proxy process is not running
+[2025-07-20 00:10:03] ALERT: DCOM devices found but no active network interfaces
+[2025-07-20 00:10:05] ALERT: 3proxy process is not running
+[2025-07-20 00:10:10] ALERT: 3proxy process is not running
+[2025-07-20 00:10:10] ALERT: Failed to restart 3proxy
+[2025-07-20 00:10:56] ALERT: 3proxy process is not running
+[2025-07-20 00:10:56] ALERT: DCOM devices found but no active network interfaces
+[2025-07-20 00:10:58] ALERT: 3proxy process is not running

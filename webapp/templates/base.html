@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ProxyFarm System{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body data-theme="dark">
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>ProxyFarm</h1>
+                <span>Management System</span>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('proxy_endpoints') }}" class="nav-link {% if request.endpoint == 'proxy_endpoints' %}active{% endif %}">
+                            <i class="fas fa-network-wired"></i>
+                            Proxy Endpoints
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('user_management') }}" class="nav-link {% if request.endpoint == 'user_management' %}active{% endif %}">
+                            <i class="fas fa-users"></i>
+                            User Management
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('dcom_devices') }}" class="nav-link {% if request.endpoint == 'dcom_devices' %}active{% endif %}">
+                            <i class="fas fa-mobile-alt"></i>
+                            DCOM Devices
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('proxy_assignment') }}" class="nav-link {% if request.endpoint == 'proxy_assignment' %}active{% endif %}">
+                            <i class="fas fa-route"></i>
+                            Routing & Assignment
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('analytics') }}" class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}">
+                            <i class="fas fa-chart-line"></i>
+                            Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ url_for('settings') }}" class="nav-link {% if request.endpoint == 'settings' %}active{% endif %}">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                {% if self.page_subtitle() %}
+                <div class="header-left">
+                    <h1 class="header-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                    <p class="header-subtitle">{% block page_subtitle %}{% endblock %}</p>
+                </div>
+                {% else %}
+                <h1 class="header-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                {% endif %}
+                <div class="header-actions">
+                    {% block header_actions %}{% endblock %}
+                    <button class="theme-toggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Common Scripts -->
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        const themeIcon = document.querySelector('.theme-toggle i');
+        themeIcon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

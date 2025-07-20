@@ -1,0 +1,30 @@
+[Unit]
+Description=ProxyFarm Management System
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/home/proxy-farm-system
+Environment=PYTHONPATH=/home/proxy-farm-system
+Environment=FLASK_APP=webapp/app.py
+Environment=FLASK_ENV=production
+ExecStart=/home/proxy-farm-system/venv/bin/python /home/proxy-farm-system/webapp/app.py
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=proxyfarm
+
+# Security settings (relaxed for /home access)
+NoNewPrivileges=yes
+ProtectSystem=false
+ProtectHome=false
+ReadWritePaths=/home/proxy-farm-system
+ReadWritePaths=/var/log
+
+[Install]
+WantedBy=multi-user.target

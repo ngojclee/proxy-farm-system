@@ -925,10 +925,20 @@ def dashboard():
     """Main dashboard page"""
     return render_template('dashboard.html')
 
+@app.route('/proxy-endpoints')
+def proxy_endpoints():
+    """Proxy endpoints page"""
+    return render_template('proxy_endpoints.html')
+
 @app.route('/users')
 def user_management():
     """User management page"""
     return render_template('user_management.html')
+
+@app.route('/dcom-devices')
+def dcom_devices():
+    """DCOM devices page"""
+    return render_template('dcom_management.html')
 
 @app.route('/proxy-assignment')
 def proxy_assignment():
@@ -944,6 +954,16 @@ def dcom_management():
 def direct_connection():
     """Direct DCOM connection page"""
     return render_template('direct_connection.html')
+
+@app.route('/analytics')
+def analytics():
+    """Analytics page"""
+    return render_template('dashboard.html')  # placeholder for now
+
+@app.route('/settings')
+def settings():
+    """Settings page"""
+    return render_template('dashboard.html')  # placeholder for now
 
 @app.route('/api/status')
 def api_status():
